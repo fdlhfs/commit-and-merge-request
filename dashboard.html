@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commit Title Validator Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .result.valid {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+
+        .result.invalid {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .result.valid .result-header {
+            color: #155724;
+        }
+
+        .result.invalid .result-header {
+            color: #721c24;
+        }
+
+        .result-body {
+            font-size: 0.95em;
+        }
+
+        .result-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .error-item {
+            border-left-color: #dc3545;
+        }
+
+        .suggestion-item {
+            border-left-color: #ffc107;
+        }
+
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .example-card {
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .example-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .example-card.valid {
+            border-left: 5px solid #28a745;
+        }
+
+        .example-card.invalid {
+            border-left: 5px solid #dc3545;
+        }
+
+        .example-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .example-code {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+
+        .type-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .type-table th,
+        .type-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .type-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .type-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #667eea;
+            color: white;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .info-box strong {
+            color: #1976D2;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .examples {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Commit Title Validator</h1>
+            <p>Validasi format commit message sesuai standar perusahaan</p>
+        </div>
+
+        <div class="dashboard">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('validator')">📝 Validator</button>
+                <button class="tab" onclick="showTab('extractor')">🔗 Reference Extractor</button>
+                <button class="tab" onclick="showTab('examples')">💡 Examples</button>
+                <button class="tab" onclick="showTab('types')">📋 Allowed Types</button>
+            </div>
+
+            <!-- Tab 1: Validator -->
+            <div id="validator" class="tab-content active">
+                <h2>Validasi Commit Title</h2>
+                <div class="info-box">
+                    <strong>Format:</strong> &lt;tipe&gt;: &lt;ringkasan singkat&gt; (Taiga #&lt;NamaProject&gt;-&lt;NomorTicket&gt;)
+                </div>
+
+                <div class="form-group">
+                    <label>Commit Title:</label>
+                    <input type="text" id="commitTitle" placeholder="feat: menambahkan fitur login user (Taiga #DATB-10353)">
+                </div>
+
+                <button class="btn" onclick="validateTitle()">Validasi</button>
+
+                <div id="validationResult" class="result"></div>
+            </div>
+
+            <!-- Tab 2: Reference Extractor -->
+            <div id="extractor" class="tab-content">
+                <h2>Ekstraksi Referensi</h2>
+                <div class="info-box">
+                    <strong>Format Referensi:</strong><br>
+                    • Ticket Link: [(Taiga #PROJECT-123)] (https://...)<br>
+                    • Documentation Link: [Nama] (https://...)<br>
+                    • Testing Link: [Nama] (https://...)
+                </div>
+
+                <div class="form-group">
+                    <label>Deskripsi Commit/MR:</label>
+                    <textarea id="description" placeholder="Ticket Link: [(Taiga #DATB-10353)] (https://projects.digitaltelkom.id/project/DATB/us/10353)
+Documentation Link: [Figma] (https://www.figma.com/design/abc123)
+Testing Link: [Test Cases] (https://docs.google.com/spreadsheets/test)"></textarea>
+                </div>
+
+                <button class="btn" onclick="extractReferences()">Ekstrak Referensi</button>
+
+                <div id="extractionResult" class="result"></div>
+            </div>
+
+            <!-- Tab 3: Examples -->
+            <div id="examples" class="tab-content">
+                <h2>Contoh Commit Title</h2>
+                
+                <h3 style="margin: 30px 0 15px 0; color: #28a745;">✅ Valid Examples</h3>
+                <div class="examples">
+                    <div class="example-card valid" onclick="useExample(this)">
+                        <div class="example-title">Feature - Login User</div>
+                        <div class="example-code">feat: menambahkan fitur login user (Taiga #DATB-10353)</div>
+                    </div>
+                    <div class="example-card valid" onclick="useExample(this)">
+                        <div class="example-title">Bug Fix - Dashboard</div>
+                        <div class="example-code">fix: memperbaiki bug pada dashboard analytics (Taiga #PROJ-123)</div>
+                    </div>
+                    <div class="example-card valid" onclick="useExample(this)">
+                        <div class="example-title">Refactor - Auth Module</div>
+                        <div class="example-code">refactor: restructure authentication module (Taiga #AUTH-456)</div>
+                    </div>
+                </div>
+
+                <h3 style="margin: 30px 0 15px 0; color: #dc3545;">❌ Invalid Examples</h3>
+                <div class="examples">
+                    <div class="example-card invalid" onclick="useExample(this)">
+                        <div class="example-title">Missing Colon</div>
+                        <div class="example-code">feat menambahkan login (Taiga #DATB-10353)</div>
+                    </div>
+                    <div class="example-card invalid" onclick="useExample(this)">
+                        <div class="example-title">Wrong Type</div>
+                        <div class="example-code">feature: add login (Taiga #DATB-10353)</div>
+                    </div>
+                    <div class="example-card invalid" onclick="useExample(this)">
+                        <div class="example-title">Summary Too Short</div>
+                        <div class="example-code">feat: add (Taiga #DATB-10353)</div>
+                    </div>
+                    <div class="example-card invalid" onclick="useExample(this)">
+                        <div class="example-title">Lowercase Project</div>
+                        <div class="example-code">feat: add login (Taiga #datb-10353)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Allowed Types -->
+            <div id="types" class="tab-content">
+                <h2>Tipe Commit yang Diperbolehkan</h2>
+                <table class="type-table">
+                    <thead>
+                        <tr>
+                            <th>Tipe</th>
+                            <th>Deskripsi</th>
+                            <th>Contoh</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="type-badge">feat</span></td>
+                            <td>Fitur baru</td>
+                            <td>feat: add login (Taiga #DATB-001)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge">fix</span></td>
+                            <td>Bug fix</td>
+                            <td>fix: resolve dashboard crash (Taiga #PROJ-002)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge">refactor</span></td>
+                            <td>Refactoring code</td>
+                            <td>refactor: improve auth logic (Taiga #AUTH-003)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge">docs</span></td>
+                            <td>Update dokumentasi</td>
+                            <td>docs: update API docs (Taiga #DOC-004)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge">style</span></td>
+                            <td>Formatting code</td>
+                            <td>style: format with prettier (Taiga #STY-005)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge">test</span></td>
+                            <td>Menambahkan tests</td>
+                            <td>test: add unit tests (Taiga #TEST-006)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge">chore</span></td>
+                            <td>Maintenance tasks</td>
+                            <td>chore: update dependencies (Taiga #CHR-007)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge">perf</span></td>
+                            <td>Performance improvement</td>
+                            <td>perf: optimize queries (Taiga #PERF-008)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge">ci</span></td>
+                            <td>CI/CD changes</td>
+                            <td>ci: update workflow (Taiga #CI-009)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge">build</span></td>
+                            <td>Build system changes</td>
+                            <td>build: update webpack (Taiga #BLD-010)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge">revert</span></td>
+                            <td>Revert previous commit</td>
+                            <td>revert: revert feature X (Taiga #REV-011)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ALLOWED_TYPES = ['feat', 'fix', 'refactor', 'docs', 'style', 'test', 'chore', 'perf', 'ci', 'build', 'revert'];
+        const TITLE_PATTERN = /^([a-z]+):\s+(.+?)\s+\(Taiga\s+#([A-Z]+)-(\d+)\)$/;
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function validateTitle() {
+            const title = document.getElementById('commitTitle').value.trim();
+            const resultDiv = document.getElementById('validationResult');
+
+            if (!title) {
+                showResult(resultDiv, false, ['Title tidak boleh kosong'], ['Masukkan commit title yang valid']);
+                return;
+            }
+
+            const match = title.match(TITLE_PATTERN);
+            
+            if (!match) {
+                const errors = analyzeFormatErrors(title);
+                const suggestions = generateSuggestions(title);
+                showResult(resultDiv, false, errors, suggestions);
+                return;
+            }
+
+            const [, type, summary, project, ticketNumber] = match;
+
+            const errors = [];
+            const suggestions = [];
+
+            if (!ALLOWED_TYPES.includes(type)) {
+                errors.push(`Tipe '${type}' tidak valid`);
+                const closest = findClosestType(type);
+                if (closest) {
+                    suggestions.push(`Mungkin maksud Anda: '${closest}'?`);
+                }
+                suggestions.push(`Tipe yang diperbolehkan: ${ALLOWED_TYPES.join(', ')}`);
+            }
+
+            if (summary.trim().length < 5) {
+                errors.push('Ringkasan terlalu pendek (minimal 5 karakter)');
+                suggestions.push('Berikan deskripsi yang lebih jelas');
+            }
+
+            if (project !== project.toUpperCase()) {
+                errors.push(`Nama project harus uppercase: '${project}' tidak valid`);
+                suggestions.push(`Gunakan: (Taiga #${project.toUpperCase()}-${ticketNumber})`);
+            }
+
+            if (errors.length > 0) {
+                showResult(resultDiv, false, errors, suggestions);
+            } else {
+                showResult(resultDiv, true, [], [], {
+                    type, summary, project, ticketNumber
+                });
+            }
+        }
+
+        function analyzeFormatErrors(title) {
+            const errors = [];
+
+            if (!title.includes(':')) {
+                errors.push("Format salah: Tidak ditemukan tanda ':' setelah tipe");
+                errors.push("Format yang benar: <tipe>: <ringkasan singkat> (Taiga #<NamaProject>-<NomorTicket>)");
+                return errors;
+            }
+
+            const parts = title.split(':', 1);
+            const potentialType = parts[0].trim().toLowerCase();
+
+            if (!ALLOWED_TYPES.includes(potentialType)) {
+                errors.push(`Tipe '${potentialType}' tidak valid`);
+                errors.push(`Tipe yang diperbolehkan: ${ALLOWED_TYPES.join(', ')}`);
+            }
+
+            if (!title.toLowerCase().includes('taiga')) {
+                errors.push('Referensi Taiga tidak ditemukan');
+                errors.push('Tambahkan: (Taiga #<NamaProject>-<NomorTicket>)');
+            } else if (!/\(Taiga\s+#[A-Z]+-\d+\)/.test(title)) {
+                errors.push('Format referensi Taiga salah');
+                errors.push('Format harus: (Taiga #<NamaProject>-<NomorTicket>)');
+                errors.push('Contoh: (Taiga #DATB-10353)');
+            }
+
+            return errors;
+        }
+
+        function generateSuggestions(title) {
+            const suggestions = [];
+            const taigaMatch = title.match(/#?([A-Z]+)-?(\d+)/);
+            
+            if (taigaMatch) {
+                const project = taigaMatch[1];
+                const ticket = taigaMatch[2];
+                let summary = title.replace(/^[a-z]+:?\s*/i, '').replace(/\(.*?\)$/, '').replace(/#?[A-Z]+-?\d+/, '').trim();
+                
+                if (!summary) {
+                    summary = 'tambahkan deskripsi perubahan';
+                }
+                
+                const suggestedTitle = `feat: ${summary} (Taiga #${project}-${ticket})`;
+                suggestions.push(`Saran perbaikan: ${suggestedTitle}`);
+            } else {
+                suggestions.push('Contoh format yang benar:');
+                suggestions.push('feat: menambahkan fitur login user (Taiga #DATB-10353)');
+            }
+
+            return suggestions;
+        }
+
+        function findClosestType(type) {
+            const typoMap = {
+                'feature': 'feat',
+                'bugfix': 'fix',
+                'bug': 'fix',
+                'document': 'docs',
+                'testing': 'test',
+                'tests': 'test',
+                'performance': 'perf',
+            };
+            return typoMap[type.toLowerCase()];
+        }
+
+        function showResult(resultDiv, isValid, errors, suggestions, parsedData = null) {
+            resultDiv.className = `result ${isValid ? 'valid' : 'invalid'} show`;
+            
+            let html = `
+                <div class="result-header">
+                    ${isValid ? '✅ VALID' : '❌ INVALID'}
+                </div>
+                <div class="result-body">
+            `;
+
+            if (isValid && parsedData) {
+                html += `
+                    <div class="result-item">
+                        <strong>Tipe:</strong> ${parsedData.type}
+                    </div>
+                    <div class="result-item">
+                        <strong>Ringkasan:</strong> ${parsedData.summary}
+                    </div>
+                    <div class="result-item">
+                        <strong>Project:</strong> ${parsedData.project}
+                    </div>
+                    <div class="result-item">
+                        <strong>Ticket:</strong> #${parsedData.ticketNumber}
+                    </div>
+                `;
+            } else {
+                if (errors.length > 0) {
+                    html += '<h3 style="margin-top: 0;">⚠️ Errors:</h3>';
+                    errors.forEach(error => {
+                        html += `<div class="result-item error-item">${error}</div>`;
+                    });
+                }
+
+                if (suggestions.length > 0) {
+                    html += '<h3 style="margin-top: 15px;">💡 Suggestions:</h3>';
+                    suggestions.forEach(suggestion => {
+                        html += `<div class="result-item suggestion-item">${suggestion}</div>`;
+                    });
+                }
+            }
+
+            html += '</div></div>';
+            resultDiv.innerHTML = html;
+        }
+
+        function extractReferences() {
+            const description = document.getElementById('description').value;
+            const resultDiv = document.getElementById('extractionResult');
+
+            const ticketLink = extractTicketLink(description);
+            const docLink = extractDocumentationLink(description);
+            const testLink = extractTestingLink(description);
+
+            if (!ticketLink && !docLink && !testLink) {
+                resultDiv.className = 'result invalid show';
+                resultDiv.innerHTML = `
+                    <div class="result-header">⚠️ Tidak Ada Referensi</div>
+                    <div class="result-body">
+                        <div class="result-item">Tidak ditemukan referensi yang valid dalam deskripsi</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="result valid show">
+                    <div class="result-header">✅ Referensi Ditemukan</div>
+                    <div class="result-body">
+            `;
+
+            if (ticketLink) {
+                html += `
+                    <div class="result-item">
+                        <h4>🎫 Ticket Link:</h4>
+                        <strong>Display:</strong> ${ticketLink.display}<br>
+                        <strong>URL:</strong> <a href="${ticketLink.url}" target="_blank">${ticketLink.url}</a>
+                    </div>
+                `;
+            }
+
+            if (docLink) {
+                html += `
+                    <div class="result-item">
+                        <h4>📄 Documentation Link:</h4>
+                        <strong>Name:</strong> ${docLink.name}<br>
+                        <strong>URL:</strong> <a href="${docLink.url}" target="_blank">${docLink.url}</a>
+                    </div>
+                `;
+            }
+
+            if (testLink) {
+                html += `
+                    <div class="result-item">
+                        <h4>🧪 Testing Link:</h4>
+                        <strong>Name:</strong> ${testLink.name}<br>
+                        <strong>URL:</strong> <a href="${testLink.url}" target="_blank">${testLink.url}</a>
+                    </div>
+                `;
+            }
+
+            html += '</div></div>';
+            resultDiv.innerHTML = html;
+        }
+
+        function extractTicketLink(text) {
+            const pattern = /Ticket\s+Link:\s*\[\(Taiga\s+#([A-Z]+)-(\d+)\)\]\s*\((https?:\/\/[^\)]+)\)/i;
+            const match = text.match(pattern);
+            
+            if (match) {
+                return {
+                    project: match[1],
+                    ticketNumber: match[2],
+                    url: match[3],
+                    display: `Taiga #${match[1]}-${match[2]}`
+                };
+            }
+            return null;
+        }
+
+        function extractDocumentationLink(text) {
+            const pattern = /Documentation\s+Link:\s*\[([^\]]+)\]\s*\(([^\)]+)\)/i;
+            const match = text.match(pattern);
+            
+            if (match) {
+                return {
+                    name: match[1],
+                    url: match[2]
+                };
+            }
+            return null;
+        }
+
+        function extractTestingLink(text) {
+            const pattern = /Testing\s+Link:\s*\[([^\]]+)\](?:\s*\(([^\)]+)\))?/i;
+            const match = text.match(pattern);
+            
+            if (match) {
+                const name = match[1];
+                const url = match[2] || name;
+                return { name, url };
+            }
+            return null;
+        }
+
+        function useExample(card) {
+            const code = card.querySelector('.example-code').textContent;
+            document.getElementById('commitTitle').value = code;
+            showTab('validator');
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            
+            setTimeout(() => validateTitle(), 300);
+        }
+
+        document.getElementById('commitTitle').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validateTitle();
+            }
+        });
+    </script>
+</body>
+</html>
