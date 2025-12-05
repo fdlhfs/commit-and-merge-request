@@ -191,7 +191,23 @@ else:
     for error in title_result.errors:
         print(f"  - {error}")
 ```
+## 🌐 Web Dashboard
 
+Buka `index.html` di browser untuk menggunakan dashboard interaktif:
+```bash
+# Buka di browser
+open index.html  # Mac
+start index.html # Windows
+```
+
+**Live Demo:** https://fdlhfs.github.io/commit-and-merge-request/
+
+Dashboard menyediakan:
+- Validasi commit title real-time
+- Ekstraksi referensi
+- Contoh-contoh
+- Daftar tipe yang diperbolehkan
+  
 ## 🎮 Demo Interaktif
 
 Jalankan demo untuk melihat berbagai scenario:
