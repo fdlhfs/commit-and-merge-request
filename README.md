@@ -291,7 +291,9 @@ commit-validator/
 ├── README.md                     # Dokumentasi
 ├── commit_validator.py           # Core validator & extractor
 ├── commit_validator_tests.py     # Unit tests (29 tests)
-└── demo.py                       # Demo & examples interaktif
+├── demo.py                       # Demo & examples interaktif
+└── index.html                    # Interactive dashboard
+
 ```
 
 ## ❓ FAQ (Frequently Asked Questions)
